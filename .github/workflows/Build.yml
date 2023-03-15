@@ -1,0 +1,47 @@
+name: Build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build_apk:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout the code
+      uses: actions/checkout@v2
+
+    - name: Install Java and Android SDK
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: 29
+        arch: x86_64
+        java-version: 8
+
+    - name: Set up Haxe and OpenFL
+      uses: HaxeFoundation/haxe-action@v2
+      with:
+        version: latest
+        haxelib: latest
+
+    - name: Build APK
+      run: openfl build android --release
+
+  build_exe:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout the code
+      uses: actions/checkout@v2
+
+    - name: Install Haxe and OpenFL
+      uses: HaxeFoundation/haxe-action@v2
+      with:
+        version: latest
+        haxelib: latest
+
+    - name: Build EXE
+      run: openfl build windows -release
