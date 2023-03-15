@@ -1,0 +1,36 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    
+    - name: Setup Haxe
+      uses: HaxeFoundation/setup-haxe@v1
+      with:
+        haxe-version: 4.2.3
+    
+    - name: Install required libraries
+      run: haxelib install <library-name>
+      
+    - name: Build Windows executable
+      run: haxe build.hxml -cpp build/windows
+      
+    - name: Build Android APK
+      run: haxelib run openfl build project.xml android -Dandroid-target-sdk-version=30
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: BackroomsLiminal
+        path: |
+          build/windows/BackroomsLiminal.exe
+          export/android/bin/BackroomsLiminal.apk
