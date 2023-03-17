@@ -12,7 +12,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
       - name: Set up Haxe and OpenFL
-        uses: DigitalMars/setup-haxe@v1.3
+        uses: OpenFL/setup-haxe@v1.3
         with:
           haxe-version: '4.2.3'
       - name: Install OpenFL
