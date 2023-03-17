@@ -1,36 +1,42 @@
-name: Build and Deploy
+name: Build and Run Game
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
-  build:
-    name: Build
+  build-and-run:
     runs-on: ubuntu-latest
-    
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    
-    - name: Setup Haxe
-      uses: HaxeFoundation/setup-haxe@v1
-      with:
-        haxe-version: 4.2.3
-    
-    - name: Install required libraries
-      run: haxelib install <library-name>
-      
-    - name: Build Windows executable
-      run: haxe build.hxml -cpp build/windows
-      
-    - name: Build Android APK
-      run: haxelib run openfl build project.xml android -Dandroid-target-sdk-version=30
-    
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: BackroomsLiminal
-        path: |
-          build/windows/BackroomsLiminal.exe
-          export/android/bin/BackroomsLiminal.apk
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Set up Haxe and OpenFL
+        uses: DigitalMars/setup-haxe@v1.3
+        with:
+          haxe-version: '4.2.3'
+      - name: Install OpenFL
+        run: haxelib install openfl
+      - name: Install Lime
+        run: haxelib install lime
+      - name: Install Android SDK
+        uses: android-actions/setup-android@v2
+        with:
+          sdk-platform: 30
+          ndk-version: 22.1.7171670
+          java-version: '11'
+      - name: Build and Sign APK
+        run: |
+          lime build android -release
+          jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore my-release-key.keystore bin/android/release/bin/MyGame-release-unsigned.apk alias_name
+          $ANDROID_HOME/build-tools/30.0.3/zipalign -v 4 bin/android/release/bin/MyGame-release-unsigned.apk bin/android/release/bin/MyGame.apk
+        env:
+          STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
+          KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
+      - name: Build and Run EXE
+        run: |
+          lime build windows -release
+          cd bin/windows/release
+          ./MyGame.exe
