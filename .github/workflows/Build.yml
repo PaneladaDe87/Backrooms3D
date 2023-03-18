@@ -1,4 +1,4 @@
-name: Build
+name: Build Game
 
 on:
   push:
@@ -8,23 +8,18 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: Install Haxe
-      uses: HaxeFoundation/haxe-action@v1.1
-      with:
-        haxe-version: '4.2.3'
-    - name: Install OpenFL
-      run: haxelib install openfl
-    - name: Build Android
-      run: openfl build android -release
-    - name: Build Windows
-      run: openfl build windows -release
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: Game artifacts
-        path: |
-          Export/windows/bin/BACKROOMS1.exe
-          Export/android/bin/BACKROOMS1.apk
+    - uses: actions/checkout@v2
+
+    - name: Install OpenFL and HaxeFlixel
+      run: |
+        haxelib install openfl
+        haxelib install flixel
+        haxelib run lime setup flixel
+
+    - name: Build APK
+      run: lime build android --release
+
+    - name: Build EXE
+      run: lime build windows -Dlegacy
