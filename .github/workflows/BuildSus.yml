@@ -17,11 +17,12 @@ jobs:
         sudo add-apt-repository ppa:haxe/releases -y
         sudo apt-get update
         sudo apt-get install haxe -y
-        mkdir ~/haxelib && haxelib setup ~/haxelib 
+        mkdir ~/haxelib
+        haxelib setup ~/haxelib 
         haxelib install lime
 
     - name: Build APK
-      run: lime build android --release
+      run: lime build android
 
     - name: Build EXE
-      run: lime build windows -Dlegacy
+      run: lime build windows
