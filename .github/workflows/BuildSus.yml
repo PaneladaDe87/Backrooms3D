@@ -1,0 +1,26 @@
+name: Build Game
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install packages
+      run: |
+        sudo add-apt-repository ppa:haxe/releases -y
+        sudo apt-get update
+        sudo apt-get install haxe -y
+        mkdir ~/haxelib && haxelib setup ~/haxelib
+
+    - name: Build APK
+      run: lime build android --release
+
+    - name: Build EXE
+      run: lime build windows -Dlegacy
