@@ -19,7 +19,7 @@ jobs:
         sudo apt-get install haxe -y
         mkdir ~/haxelib
         haxelib setup ~/haxelib 
-        sudo apt-get install lime -y
+        haxelib install lime -y
 
     - name: Build APK
       run: lime build android
@@ -37,7 +37,7 @@ jobs:
         sudo apt-get install haxe -y
         mkdir ~/haxelib
         haxelib setup ~/haxelib
-        sudo apt-get install lime -y
+        haxelib install lime -y
 
     - name: build EXE
       run: lime build windows
